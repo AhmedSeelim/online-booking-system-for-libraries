@@ -1,13 +1,37 @@
 from typing import Annotated, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlmodel import Session
+from pydantic import BaseModel, Field
 
 from ..schemas.book import BookCreate, BookRead, BookUpdate
 from ..crud import book as book_crud
-from ..deps import get_db_session, is_admin
+from ..crud import transaction as transaction_crud
+from ..deps import get_db_session, is_admin, get_current_user
 from ..models.user import User
+from ..models.book import Book
+from ..models.transaction import TransactionStatus
 
 router = APIRouter(prefix="/books", tags=["Books"])
+
+# Default book price if not specified
+DEFAULT_BOOK_PRICE = 25.00
+
+
+class PurchaseRequest(BaseModel):
+    quantity: int = Field(ge=1, description="Number of books to purchase")
+
+
+class PurchaseResponse(BaseModel):
+    transaction_id: int
+    book_id: int
+    book_title: str
+    quantity: int
+    amount: float
+    currency: str
+    status: str
+
+    class Config:
+        from_attributes = True
 
 
 @router.get("", response_model=List[BookRead])
@@ -155,3 +179,95 @@ def delete_book(
             detail="Book not found"
         )
     return None
+
+
+@router.post("/{book_id}/purchase", response_model=PurchaseResponse)
+def purchase_book(
+        book_id: int,
+        purchase_data: PurchaseRequest,
+        db: Annotated[Session, Depends(get_db_session)],
+        current_user: Annotated[User, Depends(get_current_user)]
+):
+    """
+    Purchase a book (authenticated users)
+
+    **Headers:**
+    - Authorization: Bearer {token}
+
+    **Request Body:**
+    ```json
+    {
+        "quantity": 1
+    }
+    ```
+
+    **Behavior:**
+    - Checks if sufficient stock is available
+    - Decrements stock count atomically
+    - Creates a transaction record
+    - Uses default price if book doesn't have a price field
+
+    **Response:** 200 OK
+    ```json
+    {
+        "transaction_id": 1,
+        "book_id": 5,
+        "book_title": "Clean Code",
+        "quantity": 2,
+        "amount": 50.00,
+        "currency": "USD",
+        "status": "completed"
+    }
+    ```
+
+    **Errors:**
+    - 400: Out of stock or invalid quantity
+    - 401: Not authenticated
+    - 404: Book not found
+    """
+    # Begin transaction for atomic stock check and decrement
+    with db.begin_nested():
+        # Get book with lock
+        book = db.get(Book, book_id)
+        if not book:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Book not found"
+            )
+
+        # Check stock availability
+        if book.stock_count < purchase_data.quantity:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Insufficient stock. Only {book.stock_count} copies available"
+            )
+
+        # Decrement stock atomically
+        book.stock_count -= purchase_data.quantity
+        db.add(book)
+        db.flush()
+
+    # Calculate amount (using default price as placeholder)
+    amount = DEFAULT_BOOK_PRICE * purchase_data.quantity
+
+    # Create transaction record
+    transaction = transaction_crud.create_transaction(
+        db=db,
+        user_id=current_user.id,
+        amount=amount,
+        book_id=book_id,
+        status=TransactionStatus.completed
+    )
+
+    # Commit the transaction
+    db.commit()
+
+    return PurchaseResponse(
+        transaction_id=transaction.id,
+        book_id=book.id,
+        book_title=book.title,
+        quantity=purchase_data.quantity,
+        amount=amount,
+        currency=transaction.currency,
+        status=transaction.status.value
+    )

@@ -11,6 +11,7 @@ class BookCreate(BaseModel):
     description: Optional[str] = None
     digital_url: Optional[str] = None
     stock_count: int = 0
+    price: float = 25.0
 
 
 class BookRead(BaseModel):
@@ -22,6 +23,7 @@ class BookRead(BaseModel):
     description: Optional[str] = None
     digital_url: Optional[str] = None
     stock_count: int
+    price: float
     created_at: datetime
 
     class Config:
@@ -36,3 +38,4 @@ class BookUpdate(BaseModel):
     description: Optional[str] = None
     digital_url: Optional[str] = None
     stock_count: Optional[int] = None
+    price: Optional[float] = None

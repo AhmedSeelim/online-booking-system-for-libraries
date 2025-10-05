@@ -2,8 +2,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 
-from ..schemas.user import UserCreate, UserRead, UserLogin
-from ..crud.user import create_user, get_user_by_email
+from ..schemas.user import UserCreate, UserRead, UserLogin, AddBalanceRequest
+from ..crud.user import create_user, get_user_by_email, add_balance
 from ..core.security import verify_password, create_access_token
 from ..deps import get_db_session, get_current_user
 from ..models.user import User
@@ -29,6 +29,7 @@ def signup(
 
     **Response:** 201 Created
     - Returns created user data (without password)
+    - User starts with $100.00 balance
 
     **Errors:**
     - 400: Invalid input data
@@ -101,9 +102,39 @@ def get_current_user_info(
     - Authorization: Bearer {token}
 
     **Response:** 200 OK
-    - Returns current user data
+    - Returns current user data including balance
 
     **Errors:**
     - 401: Invalid or missing token
     """
     return current_user
+
+
+@router.post("/add-balance", response_model=UserRead)
+def add_user_balance(
+        balance_data: AddBalanceRequest,
+        db: Annotated[Session, Depends(get_db_session)],
+        current_user: Annotated[User, Depends(get_current_user)]
+):
+    """
+    Add money to current user's balance
+
+    **Headers:**
+    - Authorization: Bearer {token}
+
+    **Request Body:**
+    ```json
+    {
+        "amount": 50.00
+    }
+    ```
+
+    **Response:** 200 OK
+    - Returns updated user data with new balance
+
+    **Errors:**
+    - 400: Invalid amount (must be positive)
+    - 401: Not authenticated
+    """
+    updated_user = add_balance(db, current_user.id, balance_data.amount)
+    return updated_user

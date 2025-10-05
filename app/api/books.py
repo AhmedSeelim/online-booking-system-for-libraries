@@ -203,9 +203,10 @@ def purchase_book(
 
     **Behavior:**
     - Checks if sufficient stock is available
+    - Checks if user has sufficient balance
     - Decrements stock count atomically
+    - Deducts total cost from user balance
     - Creates a transaction record
-    - Uses default price if book doesn't have a price field
 
     **Response:** 200 OK
     ```json
@@ -221,11 +222,11 @@ def purchase_book(
     ```
 
     **Errors:**
-    - 400: Out of stock or invalid quantity
+    - 400: Out of stock, insufficient balance, or invalid quantity
     - 401: Not authenticated
     - 404: Book not found
     """
-    # Begin transaction for atomic stock check and decrement
+    # Begin transaction for atomic stock check, balance deduction, and transaction creation
     with db.begin_nested():
         # Get book with lock
         book = db.get(Book, book_id)
@@ -242,13 +243,17 @@ def purchase_book(
                 detail=f"Insufficient stock. Only {book.stock_count} copies available"
             )
 
+        # Calculate total amount
+        amount = book.price * purchase_data.quantity
+
+        # Check user balance and deduct (this will raise exception if insufficient)
+        from app.crud.user import deduct_balance
+        deduct_balance(db, current_user.id, amount)
+
         # Decrement stock atomically
         book.stock_count -= purchase_data.quantity
         db.add(book)
         db.flush()
-
-    # Calculate amount (using default price as placeholder)
-    amount = DEFAULT_BOOK_PRICE * purchase_data.quantity
 
     # Create transaction record
     transaction = transaction_crud.create_transaction(

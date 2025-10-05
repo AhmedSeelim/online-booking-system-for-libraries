@@ -29,11 +29,12 @@ def create_user(db: Session, user_data: UserCreate) -> User:
             detail="Email already registered"
         )
 
-    # Create new user with hashed password
+    # Create new user with hashed password and default balance
     user = User(
         name=user_data.name,
         email=user_data.email,
-        password_hash=get_password_hash(user_data.password)
+        password_hash=get_password_hash(user_data.password),
+        balance=100.0  # Starting balance
     )
 
     db.add(user)
@@ -69,3 +70,74 @@ def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
         User object or None if not found
     """
     return db.get(User, user_id)
+
+
+def add_balance(db: Session, user_id: int, amount: float) -> User:
+    """
+    Add money to user's balance
+
+    Args:
+        db: Database session
+        user_id: User ID
+        amount: Amount to add (must be positive)
+
+    Returns:
+        Updated User object
+
+    Raises:
+        HTTPException 404: User not found
+        HTTPException 400: Invalid amount
+    """
+    if amount <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Amount must be positive"
+        )
+
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    user.balance += amount
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def deduct_balance(db: Session, user_id: int, amount: float) -> User:
+    """
+    Deduct money from user's balance
+
+    Args:
+        db: Database session
+        user_id: User ID
+        amount: Amount to deduct
+
+    Returns:
+        Updated User object
+
+    Raises:
+        HTTPException 404: User not found
+        HTTPException 400: Insufficient balance
+    """
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    if user.balance < amount:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Insufficient balance. Current balance: ${user.balance:.2f}, Required: ${amount:.2f}"
+        )
+
+    user.balance -= amount
+    db.add(user)
+    db.flush()  # Flush but don't commit yet (caller may be in transaction)
+    return user

@@ -4,7 +4,9 @@ from typing import Optional, List
 from fastapi import HTTPException, status
 
 from ..models.booking import Booking, BookingStatus
+from ..models.resource import Resource
 from ..schemas.booking import BookingCreate
+from ..crud.user import deduct_balance
 
 
 def is_resource_available(
@@ -50,7 +52,7 @@ def create_booking_atomic(
         notes: Optional[str] = None
 ) -> Booking:
     """
-    Create a booking with transactional availability check
+    Create a booking with transactional availability check and payment
 
     Args:
         db: Database session
@@ -65,15 +67,34 @@ def create_booking_atomic(
 
     Raises:
         HTTPException 409: If resource is not available (conflict)
+        HTTPException 400: If insufficient balance
     """
     # Begin explicit transaction
     with db.begin_nested():
+        # Get resource to calculate cost
+        resource = db.get(Resource, resource_id)
+        if not resource:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Resource not found"
+            )
+
+        # Calculate booking duration in hours
+        duration = end - start
+        hours = duration.total_seconds() / 3600
+
+        # Calculate total cost
+        total_cost = hours * resource.hourly_rate
+
         # Re-check availability inside transaction to prevent race conditions
         if not is_resource_available(db, resource_id, start, end):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Resource is not available for the selected time period"
             )
+
+        # Deduct balance from user (raises exception if insufficient)
+        deduct_balance(db, user_id, total_cost)
 
         # Create booking
         booking = Booking(

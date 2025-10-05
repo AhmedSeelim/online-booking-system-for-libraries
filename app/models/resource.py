@@ -21,4 +21,5 @@ class Resource(SQLModel, table=True):
     features: Optional[str] = None  # JSON string or text
     open_hour: str = Field(default="09:00")
     close_hour: str = Field(default="21:00")
+    hourly_rate: float = Field(default=10.0)  # Hourly rental price in USD
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

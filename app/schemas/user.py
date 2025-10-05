@@ -14,6 +14,7 @@ class UserRead(BaseModel):
     name: str
     email: EmailStr
     role: str
+    balance: float
     created_at: datetime
 
     class Config:
@@ -23,3 +24,7 @@ class UserRead(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+
+class AddBalanceRequest(BaseModel):
+    amount: float

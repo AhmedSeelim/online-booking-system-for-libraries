@@ -14,4 +14,5 @@ class Book(SQLModel, table=True):
     description: Optional[str] = None
     digital_url: Optional[str] = None
     stock_count: int = Field(default=0)
+    price: float = Field(default=25.0)  # Book price in USD
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

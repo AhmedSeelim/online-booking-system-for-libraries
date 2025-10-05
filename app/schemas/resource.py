@@ -11,6 +11,7 @@ class ResourceCreate(BaseModel):
     features: Optional[str] = None
     open_hour: str = "09:00"
     close_hour: str = "21:00"
+    hourly_rate: float = 10.0
 
 
 class ResourceRead(BaseModel):
@@ -21,6 +22,7 @@ class ResourceRead(BaseModel):
     features: Optional[str] = None
     open_hour: str
     close_hour: str
+    hourly_rate: float
     created_at: datetime
 
     class Config:
@@ -34,3 +36,4 @@ class ResourceUpdate(BaseModel):
     features: Optional[str] = None
     open_hour: Optional[str] = None
     close_hour: Optional[str] = None
+    hourly_rate: Optional[float] = None

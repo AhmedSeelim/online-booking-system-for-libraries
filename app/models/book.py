@@ -9,7 +9,7 @@ class Book(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str = Field(index=True)
     author: str = Field(index=True)
-    isbn: str = Field(unique=True, index=True)
+    isbn: str = Field(index=True)
     category: str = Field(index=True)
     description: Optional[str] = None
     digital_url: Optional[str] = None

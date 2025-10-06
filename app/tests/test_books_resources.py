@@ -7,33 +7,25 @@ To run tests:
 
 import pytest
 from fastapi.testclient import TestClient
-from ..main import app
+from app.main import app
 
 client = TestClient(app)
 
 
 @pytest.fixture
 def admin_token():
-    """Fixture to get admin authentication token"""
-    # Register admin user
-    client.post(
-        "/api/auth/signup",
-        json={
-            "name": "Admin",
-            "email": "admin_test@example.com",
-            "password": "adminpass"
-        }
-    )
-
-    # Login to get token
+    """Fixture to get admin authentication token using pre-seeded admin user"""
+    # Login to get token for already-seeded admin
     response = client.post(
         "/api/auth/login",
         json={
-            "email": "admin_test@example.com",
+            "email": "admin@example.com",
             "password": "adminpass"
         }
     )
+    assert response.status_code == 200, "Admin login failed — is DB seeded?"
     return response.json()["access_token"]
+
 
 
 @pytest.fixture
@@ -166,6 +158,7 @@ def test_delete_book_as_admin(admin_token):
         },
         headers={"Authorization": f"Bearer {admin_token}"}
     )
+    print("77777777",create_response.json())
     book_id = create_response.json()["id"]
 
     # Delete book
@@ -205,6 +198,7 @@ def test_create_resource_as_admin(admin_token):
         },
         headers={"Authorization": f"Bearer {admin_token}"}
     )
+    print("666666666",response.json())
     assert response.status_code == 201
 
 
@@ -263,6 +257,7 @@ def test_delete_resource_as_admin(admin_token):
         },
         headers={"Authorization": f"Bearer {admin_token}"}
     )
+    print("555555",create_response.json())
     resource_id = create_response.json()["id"]
 
     # Delete resource

@@ -7,7 +7,7 @@ To run tests:
 
 import pytest
 from fastapi.testclient import TestClient
-from ..main import app
+from app.main import app
 
 client = TestClient(app)
 
@@ -38,26 +38,18 @@ def user_token():
 
 @pytest.fixture
 def admin_token():
-    """Fixture to get admin authentication token"""
-    # Register admin user
-    client.post(
-        "/api/auth/signup",
-        json={
-            "name": "Purchase Admin",
-            "email": "purchaseadmin@example.com",
-            "password": "adminpass"
-        }
-    )
-
-    # Login to get token
+    """Fixture to get admin authentication token using pre-seeded admin user"""
+    # Login to get token for already-seeded admin
     response = client.post(
         "/api/auth/login",
         json={
-            "email": "purchaseadmin@example.com",
+            "email": "admin@example.com",
             "password": "adminpass"
         }
     )
+    assert response.status_code == 200, "Admin login failed — is DB seeded?"
     return response.json()["access_token"]
+
 
 
 @pytest.fixture

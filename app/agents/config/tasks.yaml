@@ -1,0 +1,140 @@
+receptionist_task:
+  description: >
+    #User Message: {user_message}
+    Analyze and classify intent into THREE categories: "book_question", "resources_question", 
+    or "other_question". Route most requests to "book" or "resources" as primary services.
+    
+    Classify as "book_question" for: book searches, catalog browsing, title/author queries, book information, 
+    reviews, pricing, stock availability, purchasing, categories, genres, recommendations, digital books, 
+    e-books, and download links.
+    
+    Classify as "resources_question" for: facility bookings (conference/study/reading rooms), equipment 
+    rental (3D printers, laptops, projectors), space/time slot availability checks, reservations for library 
+    facilities, viewing existing bookings, canceling bookings, and resource information (capacity, features, 
+    pricing, hours).
+    
+    Classify as "other_question" ONLY for: library hours/opening times, general policies/rules, membership 
+    information, directions, location, and contact information.
+    
+    Extract relevant parameters: book_title, author, category, resource_type, resource_id, resource_name, 
+    start_datetime, end_datetime, duration, quantity, booking_id. Be thorough as details help specialist 
+    officers.
+    
+    Provide confidence score (0.0-1.0), with most being high (0.8-1.0) due to clear categories. Include 
+    clarifying questions for missing details while still classifying intent correctly.
+    
+    Structure output using ReceptionistOutput Pydantic model with fields: intent, confidence, parsed_details 
+    (optional dict), and clarify (optional string).
+
+  expected_output: >
+    A structured ReceptionistOutput containing: (1) intent classification as ["book", "resources", 
+    "normal_question"], (2) confidence score 0.8-1.0 for clear requests, (3) parsed_details dictionary 
+    with extracted parameters - for book requests: book_title, author, category, book_id, quantity; 
+    for resource requests: resource_type, resource_id, resource_name, start_datetime, end_datetime, 
+    booking_id, duration_hours, number_of_people; for normal questions: brief direct "response" field 
+    with answer, (4) optional clarify field with specific question if exact details needed. Remember: 
+    almost everything is either "book" or "resources".
+
+  agent: receptionist_agent
+Book_Officer_task:
+  description: >
+    #User Message: {user_message}
+    #User id: {user_id}
+    #Context: {context}
+    Process book-related requests using your available tools: list_books, get_book, and purchase_book.
+    
+    **Tool Usage Guidelines:**
+    
+    1. **list_books** - Use when the user wants to:
+       - Search for books by title, author, or keyword (pass as 'q' parameter)
+       - Browse books by category (pass as 'category' parameter)
+       - See what's available in the catalog
+       Example: list_books(q="programming", category="Technology")
+    
+    2. **get_book** - Use when the user wants to:
+       - See detailed information about a specific book
+       - Check price and stock availability before purchasing
+       - Get full description and details
+       Example: get_book(book_id=1)
+    
+    3. **purchase_book** - Use when the user wants to:
+       - Buy one or more copies of a book
+       - IMPORTANT: Always get the book details first to show price and availability
+       - IMPORTANT: Seek explicit user confirmation before executing
+       - Check that user has sufficient balance
+       Example workflow:
+         1. get_book(book_id=1) to show details
+         2. Inform user: "Clean Code costs $42.99. You have $100.00 balance. Confirm purchase?"
+         3. After confirmation: purchase_book(user_id=X, book_id=1, quantity=1)
+    
+    Based on parsed details from the receptionist, decide which tool(s) to invoke and in what sequence. 
+    Always provide context about pricing, availability, and transaction outcomes. Format responses in a 
+    friendly, conversational manner. After completing any action, log it to AI_Audit_Log.
+  expected_output: >
+    A comprehensive, human-friendly response addressing the book request:
+    - For searches: Well-formatted list of books with title, author, price, stock (e.g., "I found 3 books: 
+      1. Clean Code by Robert C. Martin - $42.99 (6 in stock), 2. ...")
+    - For book details: Complete information including title, author, description, price, availability
+    - For purchases: Clear confirmation with breakdown: "Purchase successful! Clean Code ($42.99 × 1 = $42.99) 
+      has been charged to your account. Remaining balance: $57.01. Transaction ID: 1001."
+    - Always be conversational, clear, and complete. Include relevant recommendations or next steps.
+  agent: Book_Officerr_agent
+
+Resources_Officer_task:
+  description: >
+    #User Message: {user_message}
+    #User id: {user_id}
+    #Context: {context}
+    Handle facility resource bookings and inquiries using your available tools: list_resources, get_resource, 
+    check_resource_availability, create_booking, list_user_bookings, and cancel_booking.
+    
+    **Tool Usage Guidelines:**
+    
+    1. **list_resources** - Use when the user wants to:
+       - See what facilities are available (rooms, seats, equipment)
+       - Browse options with capacity filters
+       Example: list_resources(min_capacity=5)
+    
+    2. **get_resource** - Use when the user wants to:
+       - Get details about a specific room, seat, or equipment
+       - See pricing (hourly_rate), hours of operation, features
+       Example: get_resource(resource_id=1)
+    
+    3. **check_resource_availability** - Use when the user wants to:
+       - Verify if a resource is free during a specific time
+       - Check before making a booking
+       Example: check_resource_availability(resource_id=1, start="2025-10-07T10:00:00Z", 
+                                            end="2025-10-07T12:00:00Z")
+    
+    4. **create_booking** - Use when the user wants to make a reservation:
+       WORKFLOW (IMPORTANT - follow this sequence):
+         a. get_resource(resource_id) to get hourly_rate and details
+         b. check_resource_availability(resource_id, start, end) to verify it's free
+         c. Calculate cost: hours = (end - start) in hours, cost = hours × hourly_rate
+         d. Show calculation to user: "Conference Room A: 2 hours × $15/hour = $30. Confirm booking?"
+         e. After confirmation: create_booking(user_id, resource_id, start, end, notes)
+       Example: create_booking(user_id=1, resource_id=1, start="2025-10-07T10:00:00Z", 
+                               end="2025-10-07T12:00:00Z", notes="Team meeting")
+    
+    5. **list_user_bookings** - Use when the user wants to:
+       - See their current reservations
+       - Check upcoming bookings
+       Example: list_user_bookings(user_id=1, include_past=False)
+    
+    6. **cancel_booking** - Use when the user wants to cancel:
+       - Explain 1-hour cancellation policy (must cancel at least 1 hour before start time)
+       - Confirm booking ownership
+       Example: cancel_booking(user_id=1, booking_id=5)
+    
+    If a booking conflicts (409 error), suggest 3 alternative nearby time slots. Log all actions to 
+    AI_Audit_Log for transparency.
+  expected_output: >
+    A detailed, user-friendly response for the resource request:
+    - For availability: "Conference Room A is available from 10:00 AM to 12:00 PM on October 7th. Cost: 2 hours × $15/hour = $30"
+    - For booking creation: "✓ Booking confirmed! Conference Room A reserved for Oct 7, 10:00 AM - 12:00 PM. 
+      Cost: $30.00 (2 hours × $15/hour) has been deducted. Remaining balance: $70.00. Booking ID: #12"
+    - For conflicts: "Sorry, that time slot is taken. Here are 3 nearby alternatives: 1) 8:00-10:00 AM 
+      (available), 2) 1:00-3:00 PM (available), 3) 3:00-5:00 PM (available)"
+    - For cancellations: "✓ Booking #12 has been cancelled. Cancellation policy: Free cancellation up to 1 hour before start time."
+    - For listing: "You have 2 upcoming bookings: 1) Study Room 101 - Tomorrow 2:00 PM ($16.00), 2) ..."
+    Always show clear cost breakdowns and be conversational.

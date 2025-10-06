@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from ..api import auth, books, resources, bookings
+from app.api import auth, books, resources, bookings, agent
 
 api_router = APIRouter()
 
@@ -8,6 +8,7 @@ api_router.include_router(auth.router)
 api_router.include_router(books.router)
 api_router.include_router(resources.router)
 api_router.include_router(bookings.router)
+api_router.include_router(agent.router)
 
 
 @api_router.get("/ping")

@@ -8,9 +8,6 @@ python-jose[cryptography]==3.5.0
 pydantic==2.5.0
 pydantic-settings==2.11.0
 pytest==8.4.2
-crewai==0.1.0
-langchain==0.1.0
-sentence-transformers==2.2.2
-chromadb==0.4.18
-scikit-learn==1.3.2
+crewai==0.201.1
+langchain==0.3.27
 httpx==0.25.2

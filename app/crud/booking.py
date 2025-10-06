@@ -164,7 +164,8 @@ def cancel_booking(
     # Check cancellation window (unless admin)
     if not is_admin:
         now = datetime.now(timezone.utc)
-        cancellation_deadline = booking.start_datetime - timedelta(hours=cancellation_window_hours)
+        aware_start_datetime = booking.start_datetime.replace(tzinfo=timezone.utc)
+        cancellation_deadline = aware_start_datetime - timedelta(hours=cancellation_window_hours)
 
         if now > cancellation_deadline:
             raise HTTPException(

@@ -11,7 +11,7 @@ class AI_Audit_Log(SQLModel, table=True):
     input_text: str
     detected_intent: str
     actions_taken: str  # JSON string or text
-    metadata: Optional[str] = None  # JSON string
+    meta_data: Optional[str] = None  # JSON string
     timestamp: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
         index=True

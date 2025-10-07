@@ -53,19 +53,14 @@ Book_Officer_task:
     
     2. **get_book** - Use when the user wants to:
        - See detailed information about a specific book
-       - Check price and stock availability before purchasing
+       - Check price and stock availability 
        - Get full description and details
        Example: get_book(book_id=1)
     
     3. **purchase_book** - Use when the user wants to:
        - Buy one or more copies of a book
-       - IMPORTANT: Always get the book details first to show price and availability
-       - IMPORTANT: Seek explicit user confirmation before executing
        - Check that user has sufficient balance
-       Example workflow:
-         1. get_book(book_id=1) to show details
-         2. Inform user: "Clean Code costs $42.99. You have $100.00 balance. Confirm purchase?"
-         3. After confirmation: purchase_book(user_id=X, book_id=1, quantity=1)
+     
     
     Based on parsed details from the receptionist, decide which tool(s) to invoke and in what sequence. 
     Always provide context about pricing, availability, and transaction outcomes. Format responses in a 

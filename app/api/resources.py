@@ -221,6 +221,7 @@ def create_resource(
     - features: Optional JSON string of features
     - open_hour: Opening time (default: "09:00")
     - close_hour: Closing time (default: "21:00")
+    - hourly_rate: Hourly rate in USD (default: 10.0)
 
     **Response:** 201 Created
     - Returns created resource

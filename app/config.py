@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
+from pydantic import Field
 
 
 class Settings(BaseSettings):
@@ -7,9 +8,7 @@ class Settings(BaseSettings):
     JWT_SECRET: str = "change_me"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
-    CREWAI_API_KEY: str = "your_crewai_api_key"
-    OPENAI_API_KEY: str = "your_openai_api_key"
-    VECTORSTORE_DIR: str = "./app/vectorstore/db"
+    GOOGLE_API_KEY: str | None = Field(default=None, env="GOOGLE_API_KEY")
     VITE_API_URL: str = "http://localhost:8000"
 
     model_config = SettingsConfigDict(

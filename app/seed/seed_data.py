@@ -209,7 +209,7 @@ def seed_database():
             name="Conference Room A",
             type=ResourceType.room,
             capacity=12,
-            features='{"projector": true, "whiteboard": true}',
+            features='{"projector": true, "whiteboard": true, "video_conference": true, "seating": 12}',
             open_hour="08:00",
             close_hour="22:00",
             hourly_rate=15.0
@@ -218,7 +218,7 @@ def seed_database():
             name="Study Room 101",
             type=ResourceType.room,
             capacity=4,
-            features='{"whiteboard": true, "power_outlets": 4}',
+            features='{"whiteboard": true, "power_outlets": 4, "book_shelf": true, "quiet": true}',
             open_hour="09:00",
             close_hour="21:00",
             hourly_rate=8.0
@@ -227,10 +227,73 @@ def seed_database():
             name="Reading Desk #5",
             type=ResourceType.seat,
             capacity=1,
-            features='{"lamp": true, "power_outlet": true}',
+            features='{"lamp": true, "power_outlet": true, "ergonomic_chair": true}',
             open_hour="07:00",
             close_hour="23:00",
             hourly_rate=2.0
+        ))
+        resources.append(create_resource(session,
+            name="Media Lab (Computers)",
+            type=ResourceType.equipment,
+            capacity=6,
+            features='{"workstations": 6, "software": ["Photoshop","Premiere","VSCode"], "headphones": true, "reservation_required": true}',
+            open_hour="10:00",
+            close_hour="20:00",
+            hourly_rate=10.0
+        ))
+        resources.append(create_resource(session,
+            name="3D Printing Studio",
+            type=ResourceType.equipment,
+            capacity=2,
+            features='{"printers": ["Prusa MK3","Ender 3"], "filaments_supported": ["PLA","PETG"], "slicing_software": "Cura", "safety_training_required": true}',
+            open_hour="10:00",
+            close_hour="18:00",
+            hourly_rate=12.0
+        ))
+        resources.append(create_resource(session,
+            name="Group Study Room B",
+            type=ResourceType.room,
+            capacity=8,
+            features='{"large_table": true, "hdmi_input": true, "whiteboard": true, "air_conditioning": true}',
+            open_hour="09:00",
+            close_hour="21:00",
+            hourly_rate=10.0
+        ))
+        resources.append(create_resource(session,
+            name="Recording Booth",
+            type=ResourceType.equipment,
+            capacity=1,
+            features='{"microphone": "Shure SM7B", "audio_interface": "Focusrite", "soundproofing": true, "booking_slot_minutes": 30}',
+            open_hour="10:00",
+            close_hour="22:00",
+            hourly_rate=18.0
+        ))
+        resources.append(create_resource(session,
+            name="Projector Kit (portable)",
+            type=ResourceType.equipment,
+            capacity=1,
+            features='{"projector": "Epson X200", "portable_screen_included": true, "hdmi": true, "cable_kit": true}',
+            open_hour="08:00",
+            close_hour="20:00",
+            hourly_rate=5.0
+        ))
+        resources.append(create_resource(session,
+            name="Quiet Carrel Zone",
+            type=ResourceType.seat,
+            capacity=10,
+            features='{"carrels": 10, "silent_zone": true, "reading_lamp": true, "power_outlet": true}',
+            open_hour="07:00",
+            close_hour="23:00",
+            hourly_rate=1.5
+        ))
+        resources.append(create_resource(session,
+            name="Presentation Hall",
+            type=ResourceType.room,
+            capacity=80,
+            features='{"stage": true, "PA_system": true, "projector": true, "microphones": 4, "wheelchair_access": true}',
+            open_hour="08:00",
+            close_hour="22:00",
+            hourly_rate=60.0
         ))
         print(f"Created {len(resources)} resources")
 
@@ -242,7 +305,7 @@ def seed_database():
             author="F. Scott Fitzgerald",
             isbn="978-0743273565",
             category="Fiction",
-            description="A classic American novel set in the Jazz Age",
+            description="A classic American novel set in the Jazz Age that explores themes of decadence, idealism, and excess.",
             stock_count=5,
             price=12.99
         ))
@@ -251,19 +314,82 @@ def seed_database():
             author="Robert C. Martin",
             isbn="978-0132350884",
             category="Technology",
-            description="A handbook of agile software craftsmanship",
+            description="A handbook of agile software craftsmanship: practical techniques for producing readable, reusable, and refactorable code.",
             stock_count=6,
             digital_url="https://example.com/clean-code",
             price=42.99
         ))
         books.append(create_book(session,
-            title="Sapiens",
+            title="Sapiens: A Brief History of Humankind",
             author="Yuval Noah Harari",
             isbn="978-0062316097",
             category="History",
-            description="A brief history of humankind",
+            description="A sweeping exploration of the history and impact of Homo sapiens, from ancient foragers to modern societies.",
             stock_count=7,
             price=18.99
+        ))
+        books.append(create_book(session,
+            title="Thinking, Fast and Slow",
+            author="Daniel Kahneman",
+            isbn="978-0374533557",
+            category="Psychology",
+            description="A landmark book on human decision-making and the interplay between intuition and reasoning.",
+            stock_count=4,
+            price=14.99
+        ))
+        books.append(create_book(session,
+            title="Introduction to Algorithms",
+            author="Thomas H. Cormen, et al.",
+            isbn="978-0262033848",
+            category="Technology",
+            description="Comprehensive and rigorous introduction to algorithms, data structures, and complexity analysis.",
+            stock_count=3,
+            price=89.00
+        ))
+        books.append(create_book(session,
+            title="The Pragmatic Programmer",
+            author="Andrew Hunt, David Thomas",
+            isbn="978-0135957059",
+            category="Technology",
+            description="Practical advice for modern software developers emphasizing pragmatism, craftsmanship, and continuous learning.",
+            stock_count=5,
+            price=39.99
+        ))
+        books.append(create_book(session,
+            title="A People's History of the United States",
+            author="Howard Zinn",
+            isbn="978-0062397348",
+            category="History",
+            description="A perspective on American history focusing on the experiences of everyday people rather than political elites.",
+            stock_count=4,
+            price=16.00
+        ))
+        books.append(create_book(session,
+            title="Design Patterns: Elements of Reusable Object-Oriented Software",
+            author="Erich Gamma, et al.",
+            isbn="978-0201633610",
+            category="Technology",
+            description="Foundational text describing classic software design patterns and reusable solutions for common problems.",
+            stock_count=2,
+            price=54.99
+        ))
+        books.append(create_book(session,
+            title="The Road",
+            author="Cormac McCarthy",
+            isbn="978-0307387899",
+            category="Fiction",
+            description="A moving post-apocalyptic novel about a father and son journeying through a devastated landscape.",
+            stock_count=3,
+            price=11.50
+        ))
+        books.append(create_book(session,
+            title="Deep Work",
+            author="Cal Newport",
+            isbn="978-1455586691",
+            category="Self-Help",
+            description="Strategies for focused success in a distracted world; techniques to maximize deep, concentrated work.",
+            stock_count=6,
+            price=21.00
         ))
         print(f"Created {len(books)} books")
 
@@ -354,9 +480,15 @@ def seed_database():
 
         # Final summary & commit ensured by helpers
         print("\nSUMMARY:")
-        print(f"  Users: {session.exec(select(User)).count()}")
-        print(f"  Resources: {session.exec(select(Resource)).count()}")
-        print(f"  Books: {session.exec(select(Book)).count()}")
+        users = session.exec(select(User)).all()
+        print(f"  Users: {len(users)}")
+
+        resources = session.exec(select(Resource)).all()
+        print(f"  Resources: {len(resources)}")
+
+        books = session.exec(select(Book)).all()
+        print(f"  Books: {len(books)}")
+
         print(f"  Bookings created: {len(bookings_created)}")
         print(f"  Transactions created: {len(transactions_created)}")
 

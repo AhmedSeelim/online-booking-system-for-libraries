@@ -108,6 +108,7 @@ def create_book(
     - description: Optional description
     - digital_url: Optional URL to digital version
     - stock_count: Number of copies (default: 0)
+    - price: Price in USD (default: 25.00)
 
     **Response:** 201 Created
     - Returns created book

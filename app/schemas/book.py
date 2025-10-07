@@ -6,7 +6,7 @@ from typing import Optional
 class BookCreate(BaseModel):
     title: str
     author: str
-    isbn: str
+    isbn: Optional[str] = None
     category: str
     description: Optional[str] = None
     digital_url: Optional[str] = None
@@ -18,7 +18,7 @@ class BookRead(BaseModel):
     id: int
     title: str
     author: str
-    isbn: str
+    isbn: Optional[str] = None
     category: str
     description: Optional[str] = None
     digital_url: Optional[str] = None

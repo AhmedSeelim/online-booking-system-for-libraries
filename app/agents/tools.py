@@ -9,7 +9,7 @@ from datetime import datetime
 import json
 
 # Mock mode for offline testing
-MOCK_MODE = True
+MOCK_MODE = False
 
 # Mock data stores
 mock_books = [
@@ -162,8 +162,6 @@ class PurchaseBookTool(BaseTool):
     name: str = "purchase_book"
     description: str = (
         "Purchase one or more copies of a book. Deducts cost from user balance and decrements stock. "
-        "IMPORTANT: Always verify stock availability and user balance before calling. "
-        "Seek explicit user confirmation before executing purchase. "
         "Arguments: user_id, book_id, quantity (must be >= 1). "
         "Returns: JSON with transaction details: transaction_id, book_title, quantity, amount, status."
     )

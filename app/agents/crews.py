@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 from crewai import Agent, Task, Crew, Process, LLM
 from langchain.output_parsers import PydanticOutputParser
-from app.agents.config import GOOGLE_API_KEY
+from dotenv import load_dotenv
+
 from app.agents.models import ReceptionistOutput
 from app.agents.tools import create_book_tools, create_resource_tools
 from app.crud.ai_audit_log import create_audit_log
@@ -23,6 +24,8 @@ def load_yaml_config(filename: str) -> Dict[str, Any]:
     with open(config_path, 'r') as f:
         return yaml.safe_load(f)
 
+load_dotenv()
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # Load agent and task configurations
 agents_config = load_yaml_config("agents.yaml")
@@ -192,10 +195,9 @@ class LibraryAgentSystem:
             print(f"{'='*60}\n")
 
             if intent_result["intent"] == "other_question":
+                print("********",intent_result)
                 # Handle directly
-                response = intent_result["parsed_details"].get("response",
-                    "I'd be happy to help! The library is open Monday-Friday 9am-9pm, "
-                    "and Saturday-Sunday 10am-6pm. How else can I assist you?")
+                response = intent_result["clarify"]
                 return response
 
             elif intent_result["intent"] == "book_question":

@@ -1,4 +1,4 @@
-from sqlmodel import Session, select, or_
+from sqlmodel import Session, select, or_,func
 from typing import Optional, List
 
 from ..models.book import Book
@@ -27,38 +27,33 @@ def list_books(
         limit: int = 20
 ) -> List[Book]:
     """
-    List books with optional search and filtering
+    List books with optional search and filtering (case-insensitive).
 
-    Args:
-        db: Database session
-        q: Search query (searches title and author, case-insensitive)
-        category: Filter by category
-        skip: Number of records to skip (pagination)
-        limit: Maximum number of records to return
-
-    Returns:
-        List of Book objects
+    - q: case-insensitive substring match on title or author
+    - category: case-insensitive exact match (trimmed)
     """
-    statement = select(Book)
+    stmt = select(Book)
 
-    # Search by query (title or author)
+    # Search by query (title or author) -> case-insensitive
     if q:
-        search_filter = or_(
-            Book.title.ilike(f"%{q}%"),
-            Book.author.ilike(f"%{q}%")
+        q_clean = f"%{q.strip().lower()}%"
+        stmt = stmt.where(
+            or_(
+                func.lower(Book.title).like(q_clean),
+                func.lower(Book.author).like(q_clean)
+            )
         )
-        statement = statement.where(search_filter)
 
-    # Filter by category
+    # Filter by category (case-insensitive exact match)
     if category:
-        statement = statement.where(Book.category == category)
+        cat_clean = category.strip().lower()
+        stmt = stmt.where(func.lower(Book.category) == cat_clean)
 
-    # Apply pagination
-    statement = statement.offset(skip).limit(limit)
+    # Pagination
+    stmt = stmt.offset(skip).limit(limit)
 
-    books = db.exec(statement).all()
+    books = db.exec(stmt).all()
     return books
-
 
 def update_book(db: Session, book_id: int, book_data: BookUpdate) -> Optional[Book]:
     """Update a book"""

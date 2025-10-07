@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .markdown-content {
+    @apply text-sm leading-relaxed;
+  }
+  .markdown-content p {
+    @apply my-2;
+  }
+  .markdown-content a {
+    @apply text-indigo-400 hover:underline;
+  }
+  .markdown-content ul {
+    @apply list-disc list-inside my-2 space-y-1;
+  }
+  .markdown-content ol {
+    @apply list-decimal list-inside my-2 space-y-1;
+  }
+  .markdown-content pre {
+    @apply bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-md p-3 my-2 overflow-x-auto;
+  }
+  .markdown-content code {
+    @apply font-mono text-sm;
+  }
+  .markdown-content p > code, .markdown-content li > code {
+     @apply bg-gray-200 dark:bg-gray-900 rounded px-1.5 py-1;
+  }
+  .markdown-content table {
+      @apply w-full my-2 text-left border-collapse border border-gray-300 dark:border-gray-600;
+  }
+  .markdown-content th, .markdown-content td {
+      @apply border border-gray-300 dark:border-gray-600 px-3 py-1.5;
+  }
+  .markdown-content th {
+      @apply bg-gray-100 dark:bg-gray-800 font-semibold;
+  }
+  .markdown-content blockquote {
+      @apply border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-2 italic;
+  }
+}
+
+
+@keyframes bounce_dot {
+  0%, 75%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-4px);
+  }
+}
+
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: currentColor;
+  border-radius: 50%;
+}
+
+.typing-dot-1 {
+  animation: bounce_dot 1.2s infinite;
+  animation-delay: 0s;
+}
+.typing-dot-2 {
+  animation: bounce_dot 1.2s infinite;
+  animation-delay: 0.2s;
+}
+.typing-dot-3 {
+  animation: bounce_dot 1.2s infinite;
+  animation-delay: 0.4s;
+}

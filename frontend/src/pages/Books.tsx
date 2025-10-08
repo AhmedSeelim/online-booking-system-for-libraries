@@ -105,7 +105,7 @@ const Books: React.FC = () => {
       setModalError(errorMessage);
     }
   };
-
+  
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this book? This action cannot be undone.')) {
         try {

@@ -75,7 +75,7 @@ const AgentChat: React.FC = () => {
       setIsLoading(false);
     }
   };
-
+  
   const handleSuggestion = (details: AIParsedDetails) => {
     setSuggestion(details);
     const suggestionAppliedMessage: Message = { sender: 'ai', text: "I've pre-filled the form with the details. Please review and confirm." };
@@ -123,14 +123,14 @@ const AgentChat: React.FC = () => {
 
         {/* Clarification question from the agent */}
         {data.clarify && <p className="mt-3 italic text-gray-500 dark:text-gray-400">"{data.clarify}"</p>}
-
+        
         {/* Suggestion button if there are parsed details */}
         {data.parsed_details && Object.keys(data.parsed_details).length > 0 && (
           <button onClick={() => handleSuggestion(data.parsed_details)} className="mt-3 w-full bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-2 rounded">
             Apply Suggestion
           </button>
         )}
-
+        
         {/* Metadata footer */}
         <div className="text-xs text-gray-400 dark:text-gray-500 mt-3 pt-2 border-t border-gray-300 dark:border-gray-600 flex justify-between font-mono">
             <span>{data.intent}</span>

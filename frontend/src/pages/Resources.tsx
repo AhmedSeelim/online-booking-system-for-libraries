@@ -115,7 +115,7 @@ const Resources: React.FC = () => {
       setModalError(errorMessage);
     }
   };
-
+  
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this resource? This action cannot be undone.')) {
         try {

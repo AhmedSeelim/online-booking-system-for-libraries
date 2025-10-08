@@ -18,7 +18,7 @@ const Layout: React.FC = () => {
   const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
   const [amountToAdd, setAmountToAdd] = useState('');
   const [balanceStatus, setBalanceStatus] = useState('');
-
+  
   // State for the new profile dropdown
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -29,7 +29,7 @@ const Layout: React.FC = () => {
     logout();
     navigate('/login');
   };
-
+  
   const openBalanceModal = () => {
     setAmountToAdd('');
     setBalanceStatus('');
@@ -83,22 +83,22 @@ const Layout: React.FC = () => {
               {currentUser ? (
                 <>
                   <Link to="/my-bookings" className="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">My Bookings</Link>
-
+                  
                   {/* Balance Block */}
                   <div className="flex items-center space-x-2 pl-3 ml-3 border-l border-gray-200 dark:border-gray-700">
                     <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">Balance: ${currentUser.balance.toFixed(2)}</span>
-                    <button
-                      onClick={openBalanceModal}
-                      title="Add Balance"
+                    <button 
+                      onClick={openBalanceModal} 
+                      title="Add Balance" 
                       className="w-5 h-5 flex items-center justify-center bg-green-500 text-white rounded-full hover:bg-green-600 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-green-500"
                     >
                       +
                     </button>
                   </div>
-
+                  
                   {/* Profile Menu Block */}
                   <div className="relative ml-4" ref={profileMenuRef}>
-                      <button
+                      <button 
                         onClick={() => setIsProfileOpen(!isProfileOpen)}
                         className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500"
                       >

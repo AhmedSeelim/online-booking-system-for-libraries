@@ -66,11 +66,11 @@ export const formatUTCTimeToLocal = (timeString: string): string => {
   const [hours, minutes] = timeString.split(':').map(Number);
   const date = new Date();
   date.setUTCHours(hours, minutes, 0, 0);
-
+  
   if (isNaN(date.getTime())) {
     return "Invalid Time";
   }
-
+  
   return date.toLocaleTimeString(undefined, {
     hour: 'numeric',
     minute: '2-digit',

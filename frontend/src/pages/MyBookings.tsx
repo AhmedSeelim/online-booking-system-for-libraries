@@ -46,14 +46,14 @@ const MyBookings: React.FC = () => {
       const cancelledBooking = await cancelBooking(bookingId);
       setCancelStatus(prev => ({ ...prev, [bookingId]: 'Cancelled successfully!' }));
       // Update the state locally for instant feedback, instead of a full refetch
-      setBookings(currentBookings =>
+      setBookings(currentBookings => 
         currentBookings.map(b => b.id === bookingId ? { ...b, ...cancelledBooking } : b)
       );
     } catch (err: any) {
       setCancelStatus(prev => ({ ...prev, [bookingId]: `Error: ${err.response?.data?.detail || 'Failed to cancel.'}` }));
     }
   };
-
+  
   const isPast = (endTime: string) => parseUTCDate(endTime) < new Date();
 
   if (loading) return <div>Loading your bookings...</div>;
@@ -96,7 +96,7 @@ const MyBookings: React.FC = () => {
                 }
               }
             }
-
+            
             return (
               <div key={booking.id} className={`p-4 rounded-lg shadow-md ${isPast(booking.end_datetime) || booking.status === 'cancelled' ? 'bg-gray-200 dark:bg-gray-700 opacity-60' : 'bg-white dark:bg-gray-800'}`}>
                 <div className="flex justify-between items-start">
@@ -107,7 +107,7 @@ const MyBookings: React.FC = () => {
                     </p>
                     <p>Cost: {displayCost}</p>
                     {booking.notes && <p className="mt-2 text-sm italic text-gray-500 dark:text-gray-400">Notes: "{booking.notes}"</p>}
-
+                    
                     <div className="mt-2">
                       {isPast(booking.end_datetime) && booking.status !== 'cancelled' && <span className="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-300 dark:bg-gray-600 px-2 py-0.5 rounded-full">Completed</span>}
                       {booking.status === 'cancelled' && <span className="text-xs font-bold text-yellow-800 dark:text-yellow-200 bg-yellow-200 dark:bg-yellow-700 px-2 py-0.5 rounded-full">Cancelled</span>}
@@ -115,8 +115,8 @@ const MyBookings: React.FC = () => {
                   </div>
                   {!isPast(booking.end_datetime) && booking.status !== 'cancelled' && (
                       <div>
-                          <button
-                              onClick={() => handleCancel(booking.id)}
+                          <button 
+                              onClick={() => handleCancel(booking.id)} 
                               className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 disabled:bg-red-300"
                               disabled={!!cancelStatus[booking.id] && cancelStatus[booking.id] === 'Cancelling...'}
                               >

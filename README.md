@@ -4,29 +4,6 @@ A modern, AI-powered library management platform that unifies book catalog manag
 
 ---
 
-## 🌟 Features
-
-### 🔐 Core Functionality
-- **User Authentication** - Secure JWT-based authentication with role-based access (user/admin)
-- **Book Management** - Search, browse, and purchase books with real-time stock management
-- **Resource Booking** - Reserve conference rooms, study spaces, and equipment
-- **Virtual Balance System** - Manage user wallets for purchases and bookings
-- **Transaction History** - Complete audit trail of all financial operations
-
-### 🤖 AI-Powered Assistant
-- **Natural Language Interface** - Chat with AI agents using plain English
-- **Smart Intent Classification** - Automatic routing to specialized assistants
-- **Books Officer** - Helps find and purchase books
-- **Resources Officer** - Manages facility bookings and availability
-- **Complete Audit Logging** - All AI interactions logged for compliance
-
-### 👨‍💼 Admin Features
-- **Book CRUD Operations** - Create, update, and delete books from catalog
-- **Resource Management** - Manage facilities, equipment, and pricing
-- **User Management** - View and manage user accounts and balances
-
----
-
 ## 📁 Complete Project Structure
 
 ```
@@ -86,8 +63,7 @@ library-booking-system/
 │   │   └── tests/                    # Unit tests
 │   │
 │   ├── requirements.txt              # Python dependencies
-│   ├── .env.example                  # Environment template
-│   └── test_agents.py                # Agent testing script
+│   └── .env.example                # Agent testing script
 │
 ├── frontend/                         # React + TypeScript Frontend
 │   ├── src/
@@ -129,7 +105,7 @@ library-booking-system/
 │   ├── package.json                  # Dependencies
 │   ├── vite.config.ts                # Vite config
 │   ├── tailwind.config.js            # Tailwind config
-│   └── .env.example                  # Environment template
+│   └── tsconfig.node.json              
 │
 └── docs/                             # Documentation
     ├── DOCUMENTATION.md
@@ -309,19 +285,3 @@ MOCK_MODE = False  # Use real database
 
 [![Watch the demo on YouTube](https://img.youtube.com/vi/XCMonQUB6nc/0.jpg)](https://www.youtube.com/watch?v=XCMonQUB6nc)
 
-
-**Accounts for Testing:**
-
-**Admin:**
-```
-Email: admin@example.com
-Password: adminpass
-Balance: $1,000.00
-```
-
-**Regular User:**
-```
-Email: demo@example.com
-Password: demopass
-Balance: $100.00
-```
